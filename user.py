@@ -4,13 +4,16 @@ class User:
         self.user_id = user_id
         self.incomes = {}
         self.expenses = {}
+        self.status = 0
 
     def new_expense(self, date, money, category, comment=None):
         """ Добавить новый расход """
+        from bot_cash.cash_flow import Expense
         self.expenses[len(self.expenses)+1] = Expense(date, money, category, comment)
 
     def new_income(self, date, money, comment=None):
         """ Добавить новый доход """
+        from bot_cash.cash_flow import Income
         self.incomes[len(self.incomes)+1] = Income(date, money, comment)
 
     def __str__(self):
