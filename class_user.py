@@ -8,13 +8,13 @@ class User:
 
     def new_expense(self, date, money, category, comment=None):
         """ Добавить новый расход """
-        from bot_cash.cash_flow import Expense
-        self.expenses[len(self.expenses)+1] = Expense(date, money, category, comment)
+        from bot_cash.classes_cash import Expense
+        self.expenses[len(self.expenses)+1] = Expense(date, money, category, len(self.expenses)+1, comment)
 
     def new_income(self, date, money, comment=None):
         """ Добавить новый доход """
-        from bot_cash.cash_flow import Income
-        self.incomes[len(self.incomes)+1] = Income(date, money, comment)
+        from bot_cash.classes_cash import Income
+        self.incomes[len(self.incomes)+1] = Income(date, money, len(self.expenses)+1, comment)
 
     def __str__(self):
         """ Красиво вывести объект """
@@ -22,7 +22,7 @@ class User:
 
 
 if __name__ == '__main__':
-    from bot_cash.cash_flow import Expense, Income
+    from bot_cash.classes_cash import Expense, Income
 
     new_user = User('Anton', 247)
 
