@@ -21,7 +21,7 @@ def handle_first_start(message):
 
 
 @bot.message_handler(commands=['minus'])
-def handle_first_start(message):
+def handle_minus_money(message):
     """ Новый расход """
     change_status(message.from_user.id, 'm1')
     bot.send_message(message.chat.id, 'Введите следующие данные: деньги, категория и комент (по желанию)')
@@ -34,6 +34,16 @@ def handle_message(message):
     money, category, comment = range(3)
     new_expense(message.from_user.id, message.date, values[money], values[category], values[comment])
     bot.send_message(message.chat.id, 'Расход добавлен!')
+    change_status(message.from_user.id, 0)
+
+
+@bot.message_handler(commands=['expenses'])
+def handle_expenses(message):
+    """ Выводит все расходы """
+    values = all_expenses(message.from_user.id)
+
+    for j in range(len(values)):
+        bot.send_message(message.chat.id, values[j], parse_mode='Markdown')
 
 
 @bot.message_handler(content_types=['text'])

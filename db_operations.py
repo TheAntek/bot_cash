@@ -1,5 +1,5 @@
 import shelve
-from bot_cash.user import User
+from bot_cash.class_user import User
 
 
 def new_user(username, user_id):
@@ -46,6 +46,26 @@ def new_expense(user_id, date, money, category, comment=None):
     db.close()
 
 
+def all_expenses(user_id):
+    """ Возвращает все расходы юзера """
+    db = shelve.open('users-shelve-test')
+    user_expenses = db[str(user_id)].expenses
+    result = list(user_expenses.values())
+    db.close()
+    return result
+
+
+def calculate_minus(user_id):
+    """ Возвращает суму всех расходов """
+    db = shelve.open('users-shelve-test')
+    user_expenses = list(db[str(user_id)].expenses.values())
+    result = 0
+    for exp in user_expenses:
+        result += int(exp.money)
+    db.close()
+    return result
+
+
 if __name__ == '__main__':
     # change_status(322, 'm1')
     # new_user('elonmusk', 199694594)
@@ -56,5 +76,11 @@ if __name__ == '__main__':
               database[i].status)
 
     # new_expense(my, 14066947, 45, 'food', 'shaurma')
-
     database.close()
+    my = 255146705
+    spam = all_expenses(my)
+    for i in spam:
+        print(i)
+    print(spam)
+    www = calculate_minus(my)
+    print(www)
