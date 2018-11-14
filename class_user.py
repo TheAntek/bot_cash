@@ -5,6 +5,9 @@ class User:
         self.incomes = {}
         self.expenses = {}
         self.status = 0
+        self.cache_money = None
+        self.cache_category = None
+        self.cache_comment = None
 
     def new_expense(self, date, money, category, comment=None):
         """ Добавить новый расход """

@@ -37,6 +37,39 @@ def change_status(user_id, new_status):
     db.close()
 
 
+def change_cache(user_id, new_cache):
+    """ Изменить временный кэш юзера (деньги, категория, коментарий) """
+    db = shelve.open('users-shelve-test')
+    user = db[str(user_id)]
+
+    if user.status == 'm1':
+        user.cache_money = new_cache
+    elif user.status == 'm2':
+        user.cache_category = new_cache
+    elif user.status == 'm3':
+        user.cache_comment = new_cache
+
+    db[str(user_id)] = user
+    db.close()
+
+
+def all_user_cache(user_id):
+    """ Вернуть всю кєшированную инфу (Данные, которые ввел юзер) ..деньги, категория, комент """
+    db = shelve.open('users-shelve-test')
+    user = db[str(user_id)]
+    result = user.cache_money, user.cache_category, user.cache_comment
+    db.close()
+    return result
+
+
+def clean_cache(user_id):
+    """ Чистим весь кєш юзера. А зачем? Пока не чистим """
+    db = shelve.open('users-shelve-test')
+    user = db[str(user_id)]
+    user.cache_money, user.cache_category, user.cache_comment = None, None, None
+    db.close()
+
+
 def new_expense(user_id, date, money, category, comment=None):
     """ Добавить новый расход """
     db = shelve.open('users-shelve-test')
