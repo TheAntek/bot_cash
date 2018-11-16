@@ -69,14 +69,14 @@ def handle_message_m_approve(message):
         bot.send_message(message.from_user, 'Введите коректные данные')
 
 
-@bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) == 'm_approve')
-def handle_message_m_approve(message):
-    """ Добавить новый расход"""
-    values = get_value(message.text)
-    money, category, comment = range(3)
-    new_expense(message.from_user.id, message.date, values[money], values[category], values[comment])
-    bot.send_message(message.chat.id, 'Расход добавлен!')
-    change_status(message.from_user.id, 0)
+# @bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) == 'm_approve')
+# def handle_message_m_approve(message):
+#     """ Добавить новый расход"""
+#     values = get_value(message.text)
+#     money, category, comment = range(3)
+#     new_expense(message.from_user.id, message.date, values[money], values[category], values[comment])
+#     bot.send_message(message.chat.id, 'Расход добавлен!')
+#     change_status(message.from_user.id, 0)
 
 
 @bot.message_handler(commands=['expenses'])
