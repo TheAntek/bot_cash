@@ -18,37 +18,12 @@ def user_not_exist(user_id):
     return status
 
 
-def user_status(user_id):
-    """ Вернуть статус юзера """
-    db = shelve.open('users-shelve-test')
-    if str(user_id) not in db:
-        return False
-    status = db[str(user_id)].status
-    db.close()
-    return status
-
-
-def change_status(user_id, new_status):
-    """ Изменить статус юзера """
-    db = shelve.open('users-shelve-test')
-    user = db[str(user_id)]
-    user.status = new_status
-    db[str(user_id)] = user
-    db.close()
-
-
-def change_cache(user_id, new_cache):
+def change_cache(user_id, new_cache, number):
     """ Изменить временный кэш юзера (деньги, категория, коментарий) """
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
-
-    if user.status == 'm1':
-        user.cache_money = new_cache
-    elif user.status == 'm2':
-        user.cache_category = new_cache
-    elif user.status == 'm3':
-        user.cache_comment = new_cache
-
+    user_cache = ['cache_money', 'cache_category', 'cache_comment']
+    setattr(user, user_cache[number], new_cache)
     db[str(user_id)] = user
     db.close()
 
@@ -62,12 +37,12 @@ def all_user_cache(user_id):
     return result
 
 
-def clean_cache(user_id):
-    """ Чистим весь кєш юзера. А зачем? Пока не чистим """
-    db = shelve.open('users-shelve-test')
-    user = db[str(user_id)]
-    user.cache_money, user.cache_category, user.cache_comment = None, None, None
-    db.close()
+# def clean_cache(user_id):
+#     """ Чистим весь кєш юзера. А зачем? Пока не чистим """
+#     db = shelve.open('users-shelve-test')
+#     user = db[str(user_id)]
+#     user.cache_money, user.cache_category, user.cache_comment = None, None, None
+#     db.close()
 
 
 def new_expense(user_id, date, money, category, comment=None):
@@ -88,15 +63,15 @@ def all_expenses(user_id):
     return result
 
 
-def calculate_minus(user_id):
-    """ Возвращает суму всех расходов """
-    db = shelve.open('users-shelve-test')
-    user_expenses = list(db[str(user_id)].expenses.values())
-    result = 0
-    for exp in user_expenses:
-        result += int(exp.money)
-    db.close()
-    return result
+# def calculate_minus(user_id):
+#     """ Возвращает суму всех расходов """
+#     db = shelve.open('users-shelve-test')
+#     user_expenses = list(db[str(user_id)].expenses.values())
+#     result = 0
+#     for exp in user_expenses:
+#         result += int(exp.money)
+#     db.close()
+#     return result
 
 
 if __name__ == '__main__':
@@ -105,8 +80,7 @@ if __name__ == '__main__':
     database = shelve.open('users-shelve-test')
 
     for i in database:
-        print(database[i], database[i].name, database[i].user_id, database[i].incomes, database[i].expenses,
-              database[i].status)
+        print(database[i], database[i].name, database[i].user_id, database[i].incomes, database[i].expenses)
 
     # new_expense(my, 14066947, 45, 'food', 'shaurma')
     database.close()
@@ -115,5 +89,5 @@ if __name__ == '__main__':
     for i in spam:
         print(i)
     print(spam)
-    www = calculate_minus(my)
-    print(www)
+    # www = calculate_minus(my)
+    # print(www)

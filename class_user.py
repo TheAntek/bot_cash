@@ -4,7 +4,6 @@ class User:
         self.user_id = user_id
         self.incomes = {}
         self.expenses = {}
-        self.status = 0
         self.cache_money = None
         self.cache_category = None
         self.cache_comment = None
