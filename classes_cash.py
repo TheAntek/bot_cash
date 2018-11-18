@@ -1,6 +1,6 @@
 class Income:
     """ Новый доход """
-    def __init__(self, date, money, num, comment=None):
+    def __init__(self, date, money, num, comment):
         self.date = date
         self.money = money
         self.comment = comment
@@ -14,7 +14,7 @@ class Income:
 
 class Expense(Income):
     """ Новый расход. Расширяем клас Income добавлением атрибута category """
-    def __init__(self, date, money, category, num, comment=None):
+    def __init__(self, date, money, category, num, comment):
         Income.__init__(self, date, money, num, comment)
         self.category = category
 
@@ -29,5 +29,7 @@ if __name__ == '__main__':
     i1 = Income('12.11.2018', 5000, 1, 'зп за стажировку')
     print(i1, '\n')
 
-    e1 = Expense('12.11.2018', 40, 'Еда', 1)
+    e1 = Expense('12.11.2018', 40, 'Еда', 1, 'hello 1')
     print(e1)
+    e2 = Expense('13.11.2018', 50, 'Еда', 2, 'hello 2')
+    print(e2)

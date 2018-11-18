@@ -9,15 +9,17 @@ class User:
         self.cache_category = None
         self.cache_comment = None
 
-    def new_expense(self, date, money, category, comment=None):
+    def new_expense(self, date, money, category, comment):
         """ Добавить новый расход """
         from bot_cash.classes_cash import Expense
-        self.expenses[len(self.expenses)+1] = Expense(date, money, category, len(self.expenses)+1, comment)
+        num = len(self.expenses)+1
+        self.expenses[num] = Expense(date, money, category, num, comment)
 
-    def new_income(self, date, money, comment=None):
+    def new_income(self, date, money, comment):
         """ Добавить новый доход """
         from bot_cash.classes_cash import Income
-        self.incomes[len(self.incomes)+1] = Income(date, money, len(self.expenses)+1, comment)
+        num = len(self.incomes) + 1
+        self.incomes[num] = Income(date, money, num, comment)
 
     def __str__(self):
         """ Красиво вывести объект """
@@ -33,9 +35,11 @@ if __name__ == '__main__':
     print(new_user.incomes)
     print(new_user.expenses)
 
+    new_user.new_expense('20200', 50, 'food', '1 kg oranges')
     new_user.new_income('12.11.2018', 300, 'зп за урок пайтона')
     new_user.new_income('19.11.2018', 300, 'зп за урок пайтона')
 
+    print(new_user.expenses[1])
     print(new_user.incomes[1])
     print(new_user.incomes[2])
 
