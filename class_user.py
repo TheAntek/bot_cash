@@ -6,14 +6,13 @@ class User:
         self.expenses = {}
         self.status = 0
         self.cache_money = None
-        self.cache_category = None
         self.cache_comment = None
 
-    def new_expense(self, date, money, category, comment):
+    def new_expense(self, date, money, comment):
         """ Добавить новый расход """
         from bot_cash.classes_cash import Expense
         num = len(self.expenses)+1
-        self.expenses[num] = Expense(date, money, category, num, comment)
+        self.expenses[num] = Expense(date, money, num, comment)
 
     def new_income(self, date, money, comment):
         """ Добавить новый доход """
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     print(new_user.incomes)
     print(new_user.expenses)
 
-    new_user.new_expense('20200', 50, 'food', '1 kg oranges')
+    new_user.new_expense('20200', 50, '1 kg oranges')
     new_user.new_income('12.11.2018', 300, 'зп за урок пайтона')
     new_user.new_income('19.11.2018', 300, 'зп за урок пайтона')
 

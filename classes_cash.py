@@ -1,5 +1,7 @@
 class Income:
     """ Новый доход """
+    name = 'Доход'
+
     def __init__(self, date, money, num, comment):
         self.date = date
         self.money = money
@@ -8,20 +10,19 @@ class Income:
 
     def __str__(self):
         """ print() выводит все атрибуты объекта """
-        return f'*{self.__class__.__name__} {self.num}*\ndate: {self.date}\nmoney: {self.money}\n' \
-               f'comment: {self.comment}'
+        return f'*{self.name} {self.num}*\nсумма: {self.money}\nдата: {self.date}\nкоментарий: {self.comment}'
 
 
 class Expense(Income):
-    """ Новый расход. Расширяем клас Income добавлением атрибута category """
-    def __init__(self, date, money, category, num, comment):
+    """ Новый расход """
+    name = 'Расход'
+
+    def __init__(self, date, money, num, comment):
         Income.__init__(self, date, money, num, comment)
-        self.category = category
 
     def __str__(self):
         """ Добавление категории при выводе """
-        return f'*{self.__class__.__name__} {self.num}*\ndate: {self.date}\nmoney: {self.money}\n' \
-               f'category: {self.category}\ncomment: {self.comment}'
+        return Income.__str__(self)
 
 
 if __name__ == '__main__':
@@ -29,7 +30,7 @@ if __name__ == '__main__':
     i1 = Income('12.11.2018', 5000, 1, 'зп за стажировку')
     print(i1, '\n')
 
-    e1 = Expense('12.11.2018', 40, 'Еда', 1, 'hello 1')
+    e1 = Expense('12.11.2018', 40, 1, 'hello 1')
     print(e1)
-    e2 = Expense('13.11.2018', 50, 'Еда', 2, 'hello 2')
+    e2 = Expense('13.11.2018', 50, 2, 'hello 2')
     print(e2)
