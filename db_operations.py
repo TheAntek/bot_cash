@@ -38,30 +38,24 @@ def change_status(user_id, new_status):
 
 
 def change_cache(user_id, new_cache):
-    """ Изменить временный кэш юзера (деньги, категория, коментарий) """
+    """ Изменить временный кэш юзера (деньги, коментарий) """
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
 
     if user.status == 'm1' or user.status == 'p1':
         user.cache_money = new_cache
-    elif user.status == 'm2':
-        user.cache_category = new_cache
-    elif user.status == 'm3' or user.status == 'p3':
+    elif user.status == 'm2' or user.status == 'p2':
         user.cache_comment = new_cache
 
     db[str(user_id)] = user
     db.close()
 
 
-def all_user_cache(user_id, g):
-    """ Вернуть всю кєшированную инфу (Данные, которые ввел юзер) ..деньги, категория(?), комент """
+def all_user_cache(user_id):
+    """ Вернуть всю кєшированную инфу (Данные, которые ввел юзер) ..деньги, комент """
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
-    # если добавляется расход - возвращаем только деньги и комент. иначе - расход, а значит возвращаем и категорию
-    if g == 'p':
-        result = user.cache_money, user.cache_comment
-    else:
-        result = user.cache_money, user.cache_category, user.cache_comment
+    result = user.cache_money, user.cache_comment
     db.close()
     return result
 
@@ -70,15 +64,16 @@ def clean_cache(user_id):
     """ Чистим весь кєш юзера. А зачем? Пока не чистим """
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
-    user.cache_money, user.cache_category, user.cache_comment = None, None, None
+    user.cache_money, user.cache_comment = None, None
+    db[str(user_id)] = user
     db.close()
 
 
-def new_expense(user_id, date, money, category, comment):
+def new_expense(user_id, date, money, comment):
     """ Добавить новый расход """
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
-    user.new_expense(date, money, category, comment)
+    user.new_expense(date, money, comment)
     db[str(user_id)] = user
     db.close()
 
@@ -88,17 +83,6 @@ def all_expenses(user_id):
     db = shelve.open('users-shelve-test')
     user_expenses = db[str(user_id)].expenses
     result = tuple(user_expenses.values())
-    db.close()
-    return result
-
-
-def calculate_minus(user_id):
-    """ Возвращает суму всех расходов """
-    db = shelve.open('users-shelve-test')
-    user_expenses = tuple(db[str(user_id)].expenses.values())
-    result = 0
-    for exp in user_expenses:
-        result += int(exp.money)
     db.close()
     return result
 
@@ -121,6 +105,28 @@ def all_incomes(user_id):
     return result
 
 
+def calculate_minus(user_id):
+    """ Возвращает суму всех расходов """
+    db = shelve.open('users-shelve-test')
+    user_expenses = tuple(db[str(user_id)].expenses.values())
+    result = 0
+    for exp in user_expenses:
+        result += int(exp.money)
+    db.close()
+    return result
+
+
+def calculate_plus(user_id):
+    """ Возвращает суму всех доходов """
+    db = shelve.open('users-shelve-test')
+    user_incomes = tuple(db[str(user_id)].incomes.values())
+    result = 0
+    for exp in user_incomes:
+        result += int(exp.money)
+    db.close()
+    return result
+
+
 if __name__ == '__main__':
     # change_status(322, 'm1')
     # new_user('elonmusk', 199694594)
@@ -139,6 +145,5 @@ if __name__ == '__main__':
     print(spam)
     www = calculate_minus(my)
     print(f'expenses sum: {www}')
-
+    print(f'incomes sum: {calculate_plus(my)}')
     print(f'all incomes: {all_incomes(my)}')
-
