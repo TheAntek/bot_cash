@@ -42,22 +42,26 @@ def change_cache(user_id, new_cache):
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
 
-    if user.status == 'm1':
+    if user.status == 'm1' or user.status == 'p1':
         user.cache_money = new_cache
     elif user.status == 'm2':
         user.cache_category = new_cache
-    elif user.status == 'm3':
+    elif user.status == 'm3' or user.status == 'p3':
         user.cache_comment = new_cache
 
     db[str(user_id)] = user
     db.close()
 
 
-def all_user_cache(user_id):
-    """ Вернуть всю кєшированную инфу (Данные, которые ввел юзер) ..деньги, категория, комент """
+def all_user_cache(user_id, g):
+    """ Вернуть всю кєшированную инфу (Данные, которые ввел юзер) ..деньги, категория(?), комент """
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
-    result = user.cache_money, user.cache_category, user.cache_comment
+    # если добавляется расход - возвращаем только деньги и комент. иначе - расход, а значит возвращаем и категорию
+    if g == 'p':
+        result = user.cache_money, user.cache_comment
+    else:
+        result = user.cache_money, user.cache_category, user.cache_comment
     db.close()
     return result
 
@@ -70,7 +74,7 @@ def clean_cache(user_id):
     db.close()
 
 
-def new_expense(user_id, date, money, category, comment=None):
+def new_expense(user_id, date, money, category, comment):
     """ Добавить новый расход """
     db = shelve.open('users-shelve-test')
     user = db[str(user_id)]
@@ -83,7 +87,7 @@ def all_expenses(user_id):
     """ Возвращает все расходы юзера """
     db = shelve.open('users-shelve-test')
     user_expenses = db[str(user_id)].expenses
-    result = list(user_expenses.values())
+    result = tuple(user_expenses.values())
     db.close()
     return result
 
@@ -91,10 +95,28 @@ def all_expenses(user_id):
 def calculate_minus(user_id):
     """ Возвращает суму всех расходов """
     db = shelve.open('users-shelve-test')
-    user_expenses = list(db[str(user_id)].expenses.values())
+    user_expenses = tuple(db[str(user_id)].expenses.values())
     result = 0
     for exp in user_expenses:
         result += int(exp.money)
+    db.close()
+    return result
+
+
+def new_income(user_id, date, money, comment):
+    """ Добавить новый доход """
+    db = shelve.open('users-shelve-test')
+    user = db[str(user_id)]
+    user.new_income(date, money, comment)
+    db[str(user_id)] = user
+    db.close()
+
+
+def all_incomes(user_id):
+    """ Возвращает все доходы юзера """
+    db = shelve.open('users-shelve-test')
+    user_incomes = db[str(user_id)].incomes
+    result = tuple(user_incomes.values())
     db.close()
     return result
 
@@ -116,4 +138,7 @@ if __name__ == '__main__':
         print(i)
     print(spam)
     www = calculate_minus(my)
-    print(www)
+    print(f'expenses sum: {www}')
+
+    print(f'all incomes: {all_incomes(my)}')
+

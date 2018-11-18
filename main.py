@@ -27,62 +27,81 @@ def handle_minus_money(message):
     bot.send_message(message.chat.id, 'Введите сумму расхода')
 
 
-@bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) == 'm1')
-def handle_message_m1(message):
-    """ Обрабатывается сообщение, в котором юзер вводит сумму расхода """
+@bot.message_handler(commands=['plus'])
+def handle_plus_money(message):
+    """ Новый доход """
+    change_status(message.from_user.id, 'p1')
+    bot.send_message(message.chat.id, 'Введите сумму дохода')
+
+
+@bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) in ('m1', 'p1'))
+def handle_message_1(message):
+    """ Обрабатывается сообщение, в котором юзер вводит сумму расхода/дохода """
     if check_money(message.text):
         change_cache(message.from_user.id, message.text)  # добавить в временный кэш юзера введённые деньги
-        change_status(message.from_user.id, 'm2')
-        bot.send_message(message.chat.id, 'Введите категорию расхода')
+        if user_status(message.from_user.id) == 'm1':
+            change_status(message.from_user.id, 'm2')
+            bot.send_message(message.chat.id, 'Введите категорию расхода')
+        else:
+            change_status(message.from_user.id, 'p3')
+            bot.send_message(message.chat.id, 'Введите комментарий к доходу')
     else:
         bot.send_message(message.chat.id, 'Введите коректную сумму!\n(Целое число от 0 до миллиона)')
 
 
 @bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) == 'm2')
-def handle_message_m2(message):
+def handle_message_2(message):
     """ Обрабатывается сообщение, в котором юзер вводит категорию (выбирает) """
     change_cache(message.from_user.id, message.text)
     change_status(message.from_user.id, 'm3')
     bot.send_message(message.chat.id, 'Введите комментарий к расходу')
 
 
-@bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) == 'm3')
-def handle_message_m3(message):
+@bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) in ('m3', 'p3'))
+def handle_message_3(message):
     """ Обрабатывается сообщение, в котором юзер вводит комментарий """
     change_cache(message.from_user.id, message.text)
-    change_status(message.from_user.id, 'm_approve')
-    bot.send_message(message.chat.id, f'Добавить расход\n{all_user_cache(message.from_user.id)}')
+    if user_status(message.from_user.id) == 'm3':
+        change_status(message.from_user.id, 'ma')
+        bot.send_message(message.chat.id, f'Добавить расход\n{all_user_cache(message.from_user.id, "m")}')
+    else:
+        change_status(message.from_user.id, 'pa')
+        bot.send_message(message.chat.id, f'Добавить доход\n{all_user_cache(message.from_user.id, "p")}')
 
 
-@bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) == 'm_approve')
-def handle_message_m_approve(message):
+@bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) in ('ma', 'pa'))
+def handle_message_approve(message):
     """ Добавить новый расход """
     if message.text == 'Да':
+        if user_status(message.from_user.id) == 'ma':
+            values = all_user_cache(message.from_user.id, 'm')  # все введённые данные юзера (money, category, comment)
+            new_expense(message.from_user.id, message.date, values[0], values[1], values[2])  # добавляем новый расход
+            bot.send_message(message.from_user.id, 'Расход добавлен!')
+        else:
+            values = all_user_cache(message.from_user.id, 'p')  # все введённые данные юзера (money, comment)
+            new_income(message.from_user.id, message.date, values[0], values[1])  # добавляем новый доход
+            bot.send_message(message.from_user.id, 'Доход добавлен!')
         change_status(message.from_user.id, 0)  # сбрасываем статус юзера
-        values = all_user_cache(message.from_user.id)  # все введённые данные юзера (money, category, comment)
-        new_expense(message.from_user.id, message.date, values[0], values[1], values[2])  # добавляем новый расход
-        bot.send_message(message.from_user.id, 'Расход добавлен!')
     elif message.text == 'Нет':
         change_status(message.from_user.id, 0)
-        bot.send_message(message.from_user.id, 'Расход не добавлен')
+        bot.send_message(message.from_user.id, 'Операция отменена')
     else:
         bot.send_message(message.from_user, 'Введите коректные данные')
-
-
-# @bot.message_handler(content_types=['text'], func=lambda message: user_status(message.from_user.id) == 'm_approve')
-# def handle_message_m_approve(message):
-#     """ Добавить новый расход"""
-#     values = get_value(message.text)
-#     money, category, comment = range(3)
-#     new_expense(message.from_user.id, message.date, values[money], values[category], values[comment])
-#     bot.send_message(message.chat.id, 'Расход добавлен!')
-#     change_status(message.from_user.id, 0)
 
 
 @bot.message_handler(commands=['expenses'])
 def handle_expenses(message):
     """ Выводит все расходы """
     values = all_expenses(message.from_user.id)
+
+    for j in range(len(values)):
+        bot.send_message(message.chat.id, values[j], parse_mode='Markdown')
+
+
+@bot.message_handler(commands=['incomes'])
+def handle_incomes(message):
+    """ Выводит все доходы """
+    values = all_incomes(message.from_user.id)
 
     for j in range(len(values)):
         bot.send_message(message.chat.id, values[j], parse_mode='Markdown')
